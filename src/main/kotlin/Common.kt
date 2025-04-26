@@ -190,7 +190,45 @@ fun getHeight(root: Node?): Int {
     return maxOf(leftHeight, rightHeight) + 1 // Height is the max depth of left/right subtree + 1
 }
 
+fun quickestWayUp(ladders: Array<Array<Int>>, snakes: Array<Array<Int>>): Int {
+    val board = IntArray(101) { it } // Default: Each square leads to itself
 
+    // Set up ladders
+    for (ladder in ladders) {
+        board[ladder[0]] = ladder[1] // Redirect start to end of ladder
+    }
+
+    // Set up snakes
+    for (snake in snakes) {
+        board[snake[0]] = snake[1] // Redirect mouth to tail
+    }
+
+    val queue = ArrayDeque<Pair<Int, Int>>() // (current position, roll count)
+    queue.add(1 to 0) // Start from square 1 with 0 rolls
+    val visited = BooleanArray(101) // Track visited squares
+    visited[1] = true // Mark starting position as visited
+
+    while (queue.isNotEmpty()) {
+        val (currentSquare, rolls) = queue.removeFirst()
+
+        if (currentSquare == 100) return rolls // Found the shortest path
+
+        for (diceRoll in 1..6) {
+            var nextSquare = currentSquare + diceRoll
+            if (nextSquare > 100) continue // Don't go beyond the board
+
+            // Apply ladders/snakes
+            nextSquare = board[nextSquare]
+
+            if (!visited[nextSquare]) {
+                visited[nextSquare] = true
+                queue.add(nextSquare to rolls + 1)
+            }
+        }
+    }
+
+    return -1 // If unreachable
+}
 
 fun main() {
     println(isBalanced("({[]})")) // true
