@@ -195,6 +195,7 @@ fun subarraySum(nums: IntArray, k: Int): Int {
 }
 
 // Returns the length of the longest substring with at most k distinct characters.
+// Uses sliding window technique
 fun longestSubstringKDistinct(s: String, k: Int): Int {
     if (k == 0) return 0 // If k is 0, we can't have any distinct characters, so return 0.
 
