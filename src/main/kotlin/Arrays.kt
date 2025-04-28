@@ -17,6 +17,8 @@ fun maxSum(nums: IntArray): Int {
     return maxSum
 }
 
+// Returns the length of the longest substring without repeating characters
+// Uses sliding window technique
 fun lengthOfLongestSubstring(s: String): Int {
     val charIndexMap = mutableMapOf<Char, Int>() // Tracks the last seen index of each character
     var maxLength = 0
@@ -36,6 +38,8 @@ fun lengthOfLongestSubstring(s: String): Int {
     return maxLength
 }
 
+// Returns the longest substring without repeating characters.
+// Uses sliding window technique
 fun longestSubstringWithoutRepeatingChars(s: String): String {
     val charIndexMap = mutableMapOf<Char, Int>() // Tracks the last seen index of each character
     var left = 0 // Left boundary of the sliding window
@@ -60,6 +64,8 @@ fun longestSubstringWithoutRepeatingChars(s: String): String {
     return s.substring(maxStart, maxStart + maxLength)
 }
 
+// Returns the triplets whose sum is zero.
+// Uses two-pointer technique
 fun threeSum(nums: IntArray): List<List<Int>> {
     nums.sort() // Sort the array to enable two-pointer technique
     val result = mutableListOf<List<Int>>()
@@ -104,6 +110,7 @@ fun threeSum(nums: IntArray): List<List<Int>> {
 }
 
 // Returns the product of all elements except self.
+// Uses prefix and suffix products
 fun productExceptSelf(nums: IntArray): IntArray {
     val n = nums.size
     val answer = IntArray(n)
@@ -166,7 +173,7 @@ fun groupAnagrams(strs: Array<String>): List<List<String>> {
 }
 
 // Returns the total number of continuous subarrays whose sum equals k.
-// Uses prefix and hashmap strategy
+// Uses prefix sum and hashmap strategy
 fun subarraySum(nums: IntArray, k: Int): Int {
     var count = 0
     var sum = 0 // running sum
@@ -185,4 +192,38 @@ fun subarraySum(nums: IntArray, k: Int): Int {
     }
 
     return count
+}
+
+// Returns the length of the longest substring with at most k distinct characters.
+fun longestSubstringKDistinct(s: String, k: Int): Int {
+    if (k == 0) return 0 // If k is 0, we can't have any distinct characters, so return 0.
+
+    var maxLength = 0 // Stores the maximum length of a valid substring.
+    var left = 0 // Left pointer for the sliding window.
+    val charFrequency = mutableMapOf<Char, Int>() // HashMap to track character frequencies in the current window.
+
+    // Expand the window by moving the right pointer.
+    for (right in s.indices) {
+        // Add current character to the frequency map.
+        charFrequency[s[right]] = charFrequency.getOrDefault(s[right], 0) + 1
+
+        // If the window contains more than k distinct characters, shrink it from the left.
+        while (charFrequency.size > k) {
+            // Reduce the frequency of the leftmost character.
+            charFrequency[s[left]] = charFrequency[s[left]]!! - 1
+
+            // If frequency becomes 0, remove the character from the map.
+            if (charFrequency[s[left]] == 0) {
+                charFrequency.remove(s[left])
+            }
+
+            // Move the left pointer forward to reduce distinct characters in the window.
+            left++
+        }
+
+        // Update the maximum length of a valid substring.
+        maxLength = maxOf(maxLength, right - left + 1)
+    }
+
+    return maxLength // Return the longest valid substring length found.
 }
