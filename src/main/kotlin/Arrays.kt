@@ -4,6 +4,19 @@ fun main(){
 
 }
 
+// kadane's algorithm
+fun maxSum(nums: IntArray): Int {
+    var maxSum = Int.MIN_VALUE
+    var currentSum = 0
+
+    for (num in nums) {
+        currentSum = maxOf(num, currentSum + num)
+        maxSum = maxOf(maxSum, currentSum)
+    }
+
+    return maxSum
+}
+
 fun lengthOfLongestSubstring(s: String): Int {
     val charIndexMap = mutableMapOf<Char, Int>() // Tracks the last seen index of each character
     var maxLength = 0
@@ -90,28 +103,86 @@ fun threeSum(nums: IntArray): List<List<Int>> {
     return result
 }
 
+// Returns the product of all elements except self.
 fun productExceptSelf(nums: IntArray): IntArray {
     val n = nums.size
     val answer = IntArray(n)
 
-    // Calculate prefix products (left to right)
-    // In the prefix product pass, we calculate the product of all elements to the left of nums[i].
-    // For the first element (nums[0]), there are no elements to its left.
-    answer[0] = 1
-    for (i in 1 until n) {
-        answer[i] = answer[i - 1] * nums[i - 1]
+    // Calculate the prefix product and store it in the answer array
+    var prefixProduct = 1 // Initialize prefix product to 1 for the first element since there's no previous element
+    for (i in 0 until n) {
+        answer[i] = prefixProduct
+        prefixProduct *= nums[i]
     }
 
-    // Calculate suffix products (right to left) and combine with prefix
-    // In the suffix product pass, we calculate the product of all elements to the right of nums[i].
-    // For the last element (nums[n-1]), there are no elements to its right.
+    // Calculate the suffix product and multiply it with the prefix product
+    // to get the product of all elements except self
     var suffixProduct = 1
     for (i in n - 1 downTo 0) {
-        // Combine prefix and suffix products to get the final answer
-        answer[i] = answer[i] * suffixProduct
-        // Update suffix product
+        answer[i] *= suffixProduct
         suffixProduct *= nums[i]
     }
 
     return answer
+}
+
+fun merge(nums1: IntArray, m: Int, nums2: IntArray, n: Int): Unit {
+    var i = m - 1 // Pointer for the last element in nums1's valid portion
+    var j = n - 1 // Pointer for the last element in nums2
+    var k = m + n - 1 // Pointer for the last position in nums1
+
+    while (j >= 0) { // Process nums2 elements
+        if (i >= 0 && nums1[i] > nums2[j]) {
+            nums1[k] = nums1[i]
+            i--
+        } else {
+            nums1[k] = nums2[j]
+            j--
+        }
+        k--
+    }
+}
+
+fun groupAnagrams(strs: Array<String>): List<List<String>> {
+    // Create a hash map to store groups of anagrams
+    // Key: Sorted version of the string (or character count array)
+    // Value: List of original strings that are anagrams of the key
+    val anagramGroups = mutableMapOf<String, MutableList<String>>()
+
+    for (str in strs) {
+        // Generate a key by sorting the characters in the string
+        val sortedStr = str.toCharArray().sorted().joinToString("")
+
+        // If the key exists, add the string to its group; otherwise, create a new group
+        if (anagramGroups.containsKey(sortedStr)) {
+            anagramGroups[sortedStr]?.add(str)
+        } else {
+            anagramGroups[sortedStr] = mutableListOf(str)
+        }
+    }
+
+    // Convert the map values (groups of anagrams) to a list and return
+    return anagramGroups.values.toList()
+}
+
+// Returns the total number of continuous subarrays whose sum equals k.
+// Uses prefix and hashmap strategy
+fun subarraySum(nums: IntArray, k: Int): Int {
+    var count = 0
+    var sum = 0 // running sum
+    val prefixSumMap = hashMapOf<Int, Int>()
+    prefixSumMap[0] = 1 //  to handle cases where a subarray starts at index 0.
+
+    // Iterate through the array, calculating prefix sums
+    for (num in nums) {
+        sum += num
+
+        // Check if there exists a prefix sum that, when subtracted, equals k
+        count += prefixSumMap.getOrDefault(sum - k, 0)
+
+        // Store the current prefix sum in the map
+        prefixSumMap[sum] = prefixSumMap.getOrDefault(sum, 0) + 1
+    }
+
+    return count
 }
