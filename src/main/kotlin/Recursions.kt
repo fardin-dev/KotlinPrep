@@ -1,33 +1,39 @@
 package org.example
 
-//fun MutableList<Int>.swap(i: Int, j: Int) {
-//    val temp = this[i]
-//    this[i] = this[j]
-//    this[j] = temp
-//}
-
 // Given an array nums of distinct integers, return all the possible permutations. You can return the answer in any order.
-// We recursively build permutations by swapping elements.
-// Backtracking Approach: We recursively build permutations by swapping elements.
-//- After processing, we swap elements back to restore the original order.
-//- Base Case (index == nums.size)- When all elements have been placed, store the current permutation.
-//- Swapping for Permutations- Swap nums[index] with each element ahead.
-//- Restore state after recursion to avoid incorrect ordering.
+// Backtracking with a visited array
+// This prevents duplicates and ensures that each number is placed only once per permutation.
+// The currentPermutation list holds the elements dynamically without modifying nums.
+// When the size reaches nums.size, we store the result.
+// - After recursion, we remove the last added element to try other possibilities
+// O(n!) due to generating n! permutations.
 fun permute(nums: IntArray): List<List<Int>> {
     val result = mutableListOf<List<Int>>() // Stores all valid permutations
-    generatePermutations(nums.toMutableList(), 0, result) // Start backtracking
+    val currentPermutation = mutableListOf<Int>() // Stores the current state of permutation
+    val visited = BooleanArray(nums.size) // Tracks used elements
+
+    generatePermutations(nums, visited, currentPermutation, result)
     return result
 }
 
-fun generatePermutations(nums: MutableList<Int>, index: Int, result: MutableList<List<Int>>) {
-    if (index == nums.size) {
-        result.add(nums.toList()) // Found a valid permutation, add to result
+fun generatePermutations(
+    nums: IntArray,
+    visited: BooleanArray,
+    currentPermutation: MutableList<Int>,
+    result: MutableList<List<Int>>
+) {
+    if (currentPermutation.size == nums.size) {
+        result.add(currentPermutation.toList()) // Found a valid permutation, add to result
         return
     }
 
-    for (i in index until nums.size) {
-        nums.swap(index, i) // Swap to create a new permutation state
-        generatePermutations(nums, index + 1, result) // Recur for next position
-        nums.swap(index, i) // Swap back to restore original state (backtracking)
+    for (i in nums.indices) {
+        if (!visited[i]) { // Ensure each number is used only once per permutation
+            visited[i] = true
+            currentPermutation.add(nums[i]) // Add number to current permutation
+            generatePermutations(nums, visited, currentPermutation, result) // Recursive call
+            currentPermutation.removeAt(currentPermutation.size - 1) // Backtrack
+            visited[i] = false // Reset visited status for next iteration
+        }
     }
 }
