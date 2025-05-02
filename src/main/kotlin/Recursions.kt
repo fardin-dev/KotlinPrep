@@ -206,6 +206,7 @@ fun generateSubsets(
     // Iterate over remaining elements to form new subsets
     for (i in index until nums.size) {
         currentSubset.add(nums[i]) // Include element in subset
+        // By using i + 1, we make sure that each recursive call only adds numbers appearing later in the array.
         generateSubsets(nums, i + 1, currentSubset, result) // Recursive call
         currentSubset.removeAt(currentSubset.size - 1) // Backtrack: Remove last element
     }
