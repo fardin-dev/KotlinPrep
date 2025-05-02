@@ -102,3 +102,111 @@ fun generateCombinations(
         currentCombination.deleteCharAt(currentCombination.length - 1) // Backtrack: Remove last letter to try another
     }
 }
+
+
+// Approach: Backtracking + HashSet for Uniqueness
+//- Instead of generating duplicate permutations, we use a set (usedIndices) to prevent reusing numbers at the same recursion level.
+//- This ensures that duplicates in nums are only chosen once per recursive call, guaranteeing unique permutations.
+//- Recursive exploration builds permutations step-by-step, and backtracking removes elements to explore alternative paths.
+fun permuteUnique(nums: IntArray): List<List<Int>> {
+    val result = mutableListOf<List<Int>>() // Stores all unique permutations
+    val currentPermutation = mutableListOf<Int>() // Tracks ongoing permutation
+    val visited = BooleanArray(nums.size) // Keeps track of used elements
+
+    nums.sort() // Sorting ensures duplicate numbers appear consecutively, simplifying handling
+
+    generateUniquePermutations(nums, visited, currentPermutation, result)
+    return result // Return the final list of unique permutations
+}
+
+/**
+ * Recursively generates unique permutations using backtracking.
+ *
+ * @param nums - The input array of numbers.
+ * @param visited - Boolean array tracking whether a number is used.
+ * @param currentPermutation - Temporary holder for the ongoing permutation.
+ * @param result - Stores all unique permutations found.
+ */
+fun generateUniquePermutations(
+    nums: IntArray,
+    visited: BooleanArray,
+    currentPermutation: MutableList<Int>,
+    result: MutableList<List<Int>>
+) {
+    // Base case: When the permutation reaches the full length, store it
+    if (currentPermutation.size == nums.size) {
+        result.add(ArrayList(currentPermutation)) // Store a copy to prevent mutation issues
+        return
+    }
+
+    for (i in nums.indices) {
+        // Skip used numbers from the same level OR already visited elements
+        if (visited[i] || i > 0 && nums[i] == nums[i - 1] && !visited[i - 1]) continue
+
+        // Mark the element as used and add to the current permutation
+        visited[i] = true
+        currentPermutation.add(nums[i])
+
+        generateUniquePermutations(nums, visited, currentPermutation, result) // Recursive call
+
+        // Backtrack: Remove last element and reset visited state to explore other possibilities
+        currentPermutation.removeAt(currentPermutation.size - 1)
+        visited[i] = false
+    }
+}
+
+/**
+ * Generates all possible subsets (power set) of a given unique integer array.
+ *
+ * @param nums - The input array of unique integers.
+ * @return List of all subsets, each represented as a list of integers.
+ */
+
+// Approach: Backtracking
+//- We generate subsets by recursively adding elements to a temporary list and exploring all possible combinations.
+//- At each step, we have the choice to include or exclude a given element.
+//- The base case is when we process all elements, at which point we store the subset.
+//- This ensures all unique subsets are created efficiently.
+
+// Key Explanations
+//- Base Case (Adding Subset to result)- Each time generateSubsets is called, the current subset is stored.
+//- Ensures all unique subsets are added without duplicates.
+//
+//- Recursive Choice (Include or Exclude Element)- Add element → Create a new subset variation.
+//- Recursively process next element → Explore new possibilities.
+//- Remove last element (Backtracking) → Undo choice and continue.
+//
+//- Backtracking for Exploration- Ensures all possible subsets are explored without modifying previous choices.
+
+fun subsets(nums: IntArray): List<List<Int>> {
+    val result = mutableListOf<List<Int>>() // Stores all unique subsets
+    val currentSubset = mutableListOf<Int>() // Temporary storage for building subsets
+
+    generateSubsets(nums, 0, currentSubset, result) // Start recursive backtracking
+    return result // Return the list of all subsets
+}
+
+/**
+ * Recursively generates subsets using backtracking.
+ *
+ * @param nums - The input array.
+ * @param index - The current position in the array.
+ * @param currentSubset - Temporary list to build subsets.
+ * @param result - Stores all valid subsets.
+ */
+fun generateSubsets(
+    nums: IntArray,
+    index: Int,
+    currentSubset: MutableList<Int>,
+    result: MutableList<List<Int>>
+) {
+    // Store the current subset in the result (copy ensures immutability)
+    result.add(ArrayList(currentSubset))
+
+    // Iterate over remaining elements to form new subsets
+    for (i in index until nums.size) {
+        currentSubset.add(nums[i]) // Include element in subset
+        generateSubsets(nums, i + 1, currentSubset, result) // Recursive call
+        currentSubset.removeAt(currentSubset.size - 1) // Backtrack: Remove last element
+    }
+}
