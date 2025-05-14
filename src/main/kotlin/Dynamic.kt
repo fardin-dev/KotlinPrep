@@ -267,3 +267,57 @@ class NumMatrix(matrix: Array<IntArray>) {
                 prefixSum[row1][col1]
     }
 }
+
+/**
+ * Returns true if there exists a subarray of at least 2 elements
+ * whose sum is a multiple of k.
+ * ✅ Key Idea:
+ * We’re looking for a subarray of length at least 2 whose sum is a multiple of k. That is, for some subarray sum(i..j) % k == 0.
+ *
+ * ✅ Mathematical Insight:
+ * If:
+ *
+ * prefixSum[i] % k == r1
+ *
+ * prefixSum[j] % k == r1 (same remainder)
+ *
+ * Then:
+ *
+ * The subarray sum between i+1 and j is a multiple of k
+ *
+ * So we store the earliest index for each remainder of prefix sums modulo k, and check for a subarray of length ≥ 2.
+ *
+ * 🧠 How It Works:
+ * We track cumulative sums (prefixSum) as we iterate.
+ *
+ * We take prefixSum % k to check for repeating remainders.
+ *
+ * If the same remainder appears again, the sum between the two indices is divisible by k.
+ *
+ * We ensure the subarray is at least length 2 (i - prevIndex >= 2).
+ */
+fun checkSubarraySum(nums: IntArray, k: Int): Boolean {
+    val modMap = mutableMapOf<Int, Int>() // remainder -> earliest index
+    modMap[0] = -1  // Important: handles subarray starting at index 0
+
+    var prefixSum = 0
+
+    for ((i, num) in nums.withIndex()) {
+        prefixSum += num
+
+        // Handle k != 0 to avoid division by zero
+        val mod = if (k != 0) prefixSum % k else prefixSum
+
+        // If we've seen this mod before, check subarray length
+        if (modMap.containsKey(mod)) {
+            val prevIndex = modMap[mod]!!
+            if (i - prevIndex >= 2) return true
+        } else {
+            // Store the first occurrence of this mod
+            modMap[mod] = i
+        }
+    }
+
+    return false // No valid subarray found
+}
+
