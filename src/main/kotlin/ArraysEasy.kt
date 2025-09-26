@@ -97,7 +97,7 @@ fun mergeSortedArrays(arr1: Array<Int>, arr2: Array<Int>): Array<Int> {
     return mergedArray
 }
 
-// Given an array nums and a target target, return the indices of the two numbers that add up to target.
+// Given an array nums and a target, return the indices of the two numbers that add up to target.
 fun twoSum(nums: IntArray, target: Int): IntArray {
     val map = mutableMapOf<Int, Int>()
     for ((i, num) in nums.withIndex()) {
